@@ -29,7 +29,7 @@
 Configure::write(
     'Cookbook', array(
         'name' => "Michelle's Cookbook",
-        'version' => '0.9.3',
+        'version' => '0.1.0',
         'css' => array(
             'jquery.mobile.structure.min',
             'themes/michelles-cookbook.css',
