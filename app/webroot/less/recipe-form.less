@@ -1,0 +1,423 @@
+// Mikael Dunhem custom less
+
+.no-padding {
+    padding: 0 !important;
+}
+.regular-form-input {
+    margin-left: 0;
+    width: 49%;
+}
+
+.michelle-recipe > .panel {
+    .box-sizing(border-box);
+    padding: 10px;
+}
+
+.panel > ul, 
+.panel .form-section {
+    position: relative;
+    margin: 0 0 20px 0;
+    padding: 0;
+    background: #FFFFFF;
+    font-size: 16px;
+}
+
+.panel > ul li,
+.form-row  {
+    // position: relative;
+    // min-height: 42px;
+    // border-top: 1px solid #999999;
+    // border-right: 1px solid #999999;
+    // border-left: 1px solid #999999;
+    // .border-radius(0);
+
+    // .box-shadow(inset 0 1px 1px rgba(0,0,0,.075)); // Redeclare so transitions work
+    // &:focus {
+    //   border-color: darken(@infoBorder, 10%);
+    //   .box-shadow(inset 0 1px 1px rgba(0,0,0,.075), 0 0 6px lighten(@infoBorder, 20%));
+    // }
+}
+
+.form-row i {
+	cursor: pointer;
+	vertical-align: middle;
+	//margin-left: 2%;
+
+    &.delete-button {
+        color: #C6322A;
+    }
+}
+
+.form-row hr {
+	margin: 0;
+	border-top-color: #dddddd;
+}
+
+.form-row .divider {
+	height: 100%;
+	overflow: hidden;
+	background-color: white;
+	border-right: 1px solid #E5E5E5;
+}
+
+.panel .form-section .form-row:first-child {
+    .border-top-radius(6px);
+}
+
+.panel > ul li:last-child,
+.panel .form-section .form-row:last-child {
+	border-bottom: 1px solid #999999;
+    .border-bottom-radius(6px);
+}
+
+.form-row {
+    padding: 0 !important;
+}
+.method-input {
+    padding: 0 3% !important;
+
+    > input {
+        width: 82%;
+    }
+}
+
+.form-row input:not([type|=hidden]) {
+    .box-sizing(border-box);
+    // margin: 0 0 0 40px;
+    margin: 0;
+    border: none;
+    padding: 0 0 0 15px;
+    height: 42px;
+    background: none;
+    .border-radius(0);
+
+    &.full-size-input {
+        width: 100%;
+    }
+    &.large-input {
+        width: 85%;
+    }
+    &.three-quarter-size-input {
+        width: 74%;
+    }
+    &.two-thirds-size-input {
+        width: 65%;
+    }
+    &.half-size-input {
+        // margin-left: 0;
+        width: 49%;
+    }
+    &.one-third-size-input {
+        width: 33%;
+    }
+    &.one-quarter-size-input {
+        width: 24%;
+    }
+
+
+	&.regular-form-input {
+		margin-left: 0;
+        width: 49%;
+		//border-left: 1px solid #dddddd;
+	}
+    &.form-measure-amount {
+    	width: 12%;
+		margin-left: 10px;
+		padding: 0 0 0 10px;
+		border-right: 1px solid #dddddd;
+	}
+	&.form-measure {
+		margin-left: 0;
+		width: 70%;
+	}
+	&.form-ingredient-name {
+		margin-left: 0;
+		width: 88%;
+	}
+	&.form-method {
+		border-left: 1px solid #dddddd;
+		margin-left: 15%;
+		width: 74%;
+	}
+}
+
+.form-row textarea {
+    .box-sizing(border-box);
+    margin: 0;
+    border: none;
+    padding: 1% 2%;
+    width: 100%;
+    background: none;
+    .border-radius(0);
+}
+
+.form-row > input[type|=radio], .form-row > input[type|=checkbox], 
+.form-row > select {
+  float: right;
+  margin: 7px 7px 0 0;
+  height: 25px;
+  width: 25px;
+}
+
+.panel input[type|=submit] {
+    width: 100%
+}
+
+.form-row > select {
+  width: auto;
+  margin: 9px 7px 0 0;
+}
+
+.form-row .amount-input {
+	position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    margin: 0 0 0 4%;
+    line-height: 42px;
+    font-weight: bold;
+}
+
+.form-row > label {
+    position: absolute;
+    top:    0;
+    left:   0;
+    margin: 0 0 0 4%;
+    line-height: 42px;
+    font-weight: bold;
+}
+
+.form-row > span {
+    position: absolute;
+    padding: 12px 10px 0 110px;
+    margin: 0;
+}
+
+.form-row > .toggle {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 100px;
+    height: 28px;
+}
+
+.placeHolderTextColor(@color: #555) {
+  ::-webkit-input-placeholder {
+    color: @color;
+  }
+  :-moz-placeholder {
+    color: @color;
+  }
+  :-ms-input-placeholder {
+    color: @color;
+  }
+}
+
+/*********** Custom Mix-In ************/
+// Mixin for form field states
+.formFieldState(@textColor: #555, @borderColor: #ccc, @backgroundColor: #f5f5f5) {
+  border-color: @borderColor;
+
+  // Set the placeholder text color
+  .placeHolderTextColor(@textColor);
+
+  // This currently doesn't work, need to find a different solution
+  &:last-child {
+    border-bottom-color: @borderColor;
+  }
+  
+  input,
+  select,
+  textarea {
+    border-color: @borderColor;
+    .box-shadow(inset 0 1px 1px rgba(0,0,0,.075)); // Redeclare so transitions work
+    &:focus {
+      border-color: darken(@borderColor, 10%);
+      .box-shadow(inset 0 1px 1px rgba(0,0,0,.075), 0 0 6px lighten(@borderColor, 20%));
+    }
+  }
+}
+
+/*********************/
+
+// Warning
+.form-row.warning {
+  .formFieldState(@warningText, @warningText, @warningBackground);
+}
+// Error
+.form-row.error {
+  .formFieldState(@errorText, @errorText, @errorBackground);
+}
+.help-block.error {
+  color: @errorText;
+}
+// Success
+.form-row.success {
+  .formFieldState(@successText, @successText, @successBackground);
+}
+// Success
+.form-row.info {
+  .formFieldState(@infoText, @infoText, @infoBackground);
+}
+
+.toggle {
+    border: 1px solid #888888;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    font-size: 19px;
+    font-weight: bold;
+    line-height: 30px;
+}
+
+.toggle[toggled="true"] {
+    border: 1px solid #143fae;
+}
+
+.toggleOn {
+    display: none;
+    position: absolute;
+    width: 60px;
+    text-align: center;
+    left: 0;
+    top: 0;
+    color: #FFFFFF;
+    text-shadow: rgba(0, 0, 0, 0.4) 0px -1px 0;
+}
+
+.toggleOff {
+    position: absolute;
+    width: 60px;
+    text-align: center;
+    right: 0;
+    top: 0;
+    color: #666666;
+}
+
+.toggle[toggled="true"] > .toggleOn {
+    display: block;
+}
+
+.toggle[toggled="true"] > .toggleOff {
+    display: none;
+}
+
+.thumb {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 40px;
+    height: 28px;    
+    border: 1px solid #888888;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+}
+
+.toggle[toggled="true"] > .thumb {
+    left: auto;
+    right: -1px;
+}
+
+.panel > h2 {
+    margin: 0 0 8px 14px;
+    font-size: inherit;
+    font-weight: bold;
+    color: #4d4d70;
+    text-shadow: rgba(255, 255, 255, 0.75) 2px 2px 0;
+}
+
+// .form-section ul li input[type="text"],
+// .form-section ul li input[type="password"],
+// .form-section ul li input[type="tel"],
+// .form-section ul li input[type="number"],
+// .form-section ul li input[type="search"],
+// .form-section ul li input[type="email"],
+// .form-section ul li input[type="url"],
+// .form-section ul li textarea,
+// .form-section ul li select {
+// color: white;
+// text-shadow: #3C3D3E 0 -1px 0;
+// background: transparent;
+// border: 0;
+// font: normal 17px "Helvetica Neue", Helvetica;
+// padding: 0;
+// display: inline-block;
+// margin-left: 0px;
+// width: 100%;
+// -webkit-appearance: textarea;
+// }
+
+/**** Bootstrap edits ****/
+
+// Form inputs with nav-stacked
+// STACKED NAV
+// -----------
+
+// Stacked tabs and pills
+.nav-stacked > li > input {
+    background: transparent;
+    border: 0;
+    #font > .sans-serif(17px);
+    .placeholder();
+    // font: normal 17px "Helvetica Neue", Helvetica;
+    margin: 0;
+    padding: 0 5px;
+    height: 35px;
+    display: inline-block;
+    //margin-left: 0px;
+    width: 97%;
+    -webkit-appearance: textarea;
+  // margin-right: 0; // no need for the gap between nav items
+}
+
+// Tabs
+.nav-tabs.nav-stacked > li {
+  background-color: @white;
+}
+.nav-tabs.nav-stacked > li:first-child {
+  .border-top-radius(4px);
+}
+.nav-tabs.nav-stacked > li:last-child {
+  .border-bottom-radius(4px);
+}
+.nav-tabs.nav-stacked > li > input:hover {
+  border-color: #ddd;
+  z-index: 2;
+}
+.nav-pills.nav-stacked > li > input {
+  margin-bottom: 3px;
+}
+.nav-pills.nav-stacked > li:last-child > input {
+  margin-bottom: 1px; // decrease margin to match sizing of stacked tabs
+}
+
+/* ---------- Login Form -------------- */
+.RecipesForm {
+    .row-fluid [class*="span"] {
+        float: none;
+        .center-block();
+        .box-sizing(border-box);
+    }
+    .nav-stacked > li {
+        border: 1px solid #bbb;
+        .border-radius(0);
+        padding: 0;
+    }
+    .nav-stacked > li:first-child {
+        .border-top-radius(4px);
+    }
+    .nav-stacked > li:last-child {
+        .border-bottom-radius(4px);
+    }
+
+}
+
+
+// Custom Helper classes
+.centered {
+    .center-block();
+}
+
+
+
+
+

@@ -1,0 +1,101 @@
+{
+    "Recipe": {
+        "name": "Pear-Hazelnut Crisp",
+        "description": "This is a great fall recipe to make with children. The kids can help peel the fruit; then, while you core and slice it, have the kids blend the ingredients for the hazelnut topping together with their fingers. They love that step.",
+        "category": "Desert",
+        "prep_time": "",
+        "cook_time": "",
+        "servings": "",
+        "notes": "To skin hazelnuts, spread them on a rimmed baking sheet. Bake in a 350 degree oven for 10-15 minutes, until the skins have cracked. While the nuts are still quite hot, transfer to a dish towel; fold or close over the towel and rub vigorously to dislodge the skins. (This will make a mess.)"
+    },
+    "Ingredient": [
+        {
+            "name": "6 ripe pears, peeled, cored, and cut into medium dice",
+            "for": "Filling"
+        },
+        {
+            "name": "2 teaspoons freshly squeezed lemon joice",
+            "for": "Filling"
+        },
+        {
+            "name": "1\/4 cup packed light brown sugar",
+            "for": "Filling"
+        },
+        {
+            "name": "2 tablespoons flour",
+            "for": "Filling"
+        },
+        {
+            "name": "2 tablespoons water",
+            "for": "Filling"
+        },
+        {
+            "name": "1\/2 cup skinned hazelnuts, finely chopped",
+            "for": "Topping"
+        },
+        {
+            "name": "1 cup flour",
+            "for": "Topping"
+        },
+        {
+            "name": "6 tablespoons light brown sugar",
+            "for": "Topping"
+        },
+        {
+            "name": "Pinch ground cinnamon",
+            "for": "Topping"
+        },
+        {
+            "name": "Pinch kosher salt",
+            "for": "Topping"
+        },
+        {
+            "name": "6 tablespoons (3\/4 stick) unsalted butter, cut into small pieces",
+            "for": "Topping"
+        },
+        {
+            "name": "1 1\/2 cups chilled heavy whipping cream",
+            "for": "Whipped Cream"
+        },
+        {
+            "name": "1 teaspoon confectioners sugar, or to taste",
+            "for": "Topping"
+        },
+        {
+            "name": "1 teaspoon vanilla extract, or to taste",
+            "for": "Topping"
+        }
+    ],
+    "Direction": [
+        {
+            "step": "For the filling: Preheat the oven to 375 degrees. Place a large, 2-inch-deep baking dish or several smaller baking dishes on a baking sheet.",
+            "step_number": "1",
+            "for": ""
+        },
+        {
+            "step": "Combine the pears, lemon juice, brown sugar and flour in a large bowl, then pour the mixture into the baking dish(es). Sprinkle the surface with water.",
+            "step_number": "2",
+            "for": ""
+        },
+        {
+            "step": "For the topping: Combine the hazelnuts, flour, brown sugar, the cinnamon and salt in a separate bowl. Work the butter pieces in with your fingers to form a crumbly mixture, then scatter it over the surface of the pears, pressing lightly to fit it all in.",
+            "step_number": "3",
+            "for": ""
+        },
+        {
+            "step": "Bake (on the baking sheet) until golden brown and bubbly around the edges of the dish, about 45 minutes. Let stand for at least 10 minutes before serving.",
+            "step_number": "4",
+            "for": ""
+        },
+        {
+            "step": "While the crisp is in the oven, make the whipped cream: Whisk together the cream, sugar and vanilla extract in a clean metal bowl (preferably chilled) to form soft peaks. Cover and refrigerate until ready to use.",
+            "step_number": "5",
+            "for": ""
+        },
+        {
+            "step": "Serve each portion of the pear-hazelnut crisp with a dollop of the whipped cream.",
+            "step_number": "6",
+            "for": ""
+        }
+    ]
+}

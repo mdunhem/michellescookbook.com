@@ -1,0 +1,71 @@
+/**
+ *	Custom CSS for Dunhem Family Recipes
+ *
+ *	@author Mikael Dunhem, 2012
+ */
+
+.michelle-recipes .pull-up {
+ 	margin-top: -6px;
+ }
+.michelle-recipes .flat-bottom-left {
+ 	-webkit-border-radius: 0 3px 0 0;
+       -moz-border-radius: 0 3px 0 0;
+            border-radius: 0 3px 0 0;
+ }
+.michelle-recipes .flat-bottom-right {
+ 	-webkit-border-radius: 3px 0 0 0;
+       -moz-border-radius: 3px 0 0 0;
+            border-radius: 3px 0 0 0;
+ }
+.michelle-recipes .flat-top {
+ 	-webkit-border-radius: 0 0 3px 3px;
+       -moz-border-radius: 0 0 3px 3px;
+            border-radius: 0 0 3px 3px;
+ }
+.michelle-recipes .input-medium {
+ 	width: 177px;
+ }
+.michelle-recipes .input-append input {
+ 	margin-left: 0px;
+ }
+.michelle-recipes .remove-button {
+      margin-top: -13px;
+      margin-left: -4px;
+}
+
+.divider {
+ 	margin: 20px 0;
+	border: 0;
+	border-top: 1px solid #CBCED3;
+	border-bottom: 1px solid #FCFCFC;
+	border-left: 0;
+	border-right: 0;
+ }
+
+ @media (min-width: 1200px) {
+ 	/*#createRecipeForm {
+ 		padding-left: 35%;
+ 		padding-right: 35%;
+ 	}
+ 	#createRecipeForm .well {
+ 		
+ 	}
+ 	#createRecipeForm .input-large {
+ 		width: 100%;
+ 	}*/
+ }
+
+ @media (max-width: 767px) {
+ 	.michelle-recipes .pull-up {
+ 		margin-top: -7px;
+ 	}
+ 	.michelle-recipes .input-extra-mini {
+ 		width: 20px;
+ 	}
+ 	.michelle-recipes .input-medium {
+ 		width: 193px;
+ 	}
+ 	.michelle-recipes .input-large {
+ 		width: 240px;
+ 	}
+ }
