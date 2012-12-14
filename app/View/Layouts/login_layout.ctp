@@ -42,17 +42,7 @@
         <?php
             // echo $this->Html->css('bootstrap');
             // echo $this->Html->css('bootstrap-responsive');
-            // echo $this->Html->css(
-            //     array(
-            //         'themes/michelles-cookbook.css',
-            //         'http://code.jquery.com/mobile/1.2.0/jquery.mobile.structure-1.2.0.min.css',
-            //         // 'http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css',
-            //         'style',
-            //         'style-responsive',
-            //         'custom-bootstrap',
-            //         'custom'
-            //     )
-            // );
+
             echo $this->Html->css(Configure::read('Cookbook.css'));
 
             echo $this->fetch('meta');
