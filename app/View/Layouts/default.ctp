@@ -98,7 +98,7 @@
 
     // Footer
     $text = $this->Html->para('pull-left', '&copy; <a href="//github.com/mdunhem">Mikael Dunhem</a> 2012');
-    $text .= $this->Html->para('pull-right', 'App Version: ' . Configure::read('Cookbook.version'));
+    $text .= $this->Html->para('pull-right', 'Version: ' . Configure::read('Cookbook.version'));
     echo $this->Html->div(
         null,
         $this->Html->div(
