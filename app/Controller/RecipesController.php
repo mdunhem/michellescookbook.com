@@ -126,21 +126,21 @@ class RecipesController extends AppController {
         // }
         // // Debugger::log(json_decode($fileContents, true));
 
-        // if (!empty($recipes)) {
-        //     if ($this->Recipe->saveAll($recipes, array('validate' => false, 'deep' => true))) {
-        //         $this->Session->setFlash('Your recipes have been saved.', 'flashSuccess');
-        //         $this->Session->write('redirectURL', Router::url(array('action' => 'index')));
-        //         $this->redirect(array('action' => 'index'));
-        //     } else {
-        //         $this->Session->setFlash('Your recipes could not be saved.', 'flashError');
-        //         $this->Session->write('redirectURL', Router::url(array('action' => 'index')));
-        //         $this->redirect(array('action' => 'index'));
-        //     }
-        // } else {
-        //     $this->Session->setFlash('File is empty.', 'flashError');
-        //     $this->Session->write('redirectURL', Router::url(array('action' => 'index')));
-        //     $this->redirect(array('action' => 'index'));
-        // }
+        if (!empty($recipes)) {
+            if ($this->Recipe->saveAll($recipes, array('validate' => false, 'deep' => true))) {
+                $this->Session->setFlash('Your recipes have been saved.', 'flashSuccess');
+                $this->Session->write('redirectURL', Router::url(array('action' => 'index')));
+                $this->redirect(array('action' => 'index'));
+            } else {
+                $this->Session->setFlash('Your recipes could not be saved.', 'flashError');
+                $this->Session->write('redirectURL', Router::url(array('action' => 'index')));
+                $this->redirect(array('action' => 'index'));
+            }
+        } else {
+            $this->Session->setFlash('File is empty.', 'flashError');
+            $this->Session->write('redirectURL', Router::url(array('action' => 'index')));
+            $this->redirect(array('action' => 'index'));
+        }
     }
 
     /**
