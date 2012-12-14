@@ -29,7 +29,7 @@
 Configure::write(
     'Cookbook', array(
         'name' => "Michelle's Cookbook",
-        'version' => '0.1.0',
+        'version' => '0.1.1',
         'css' => array(
             'jquery.mobile.structure.min',
             'themes/michelles-cookbook.css',
@@ -40,12 +40,6 @@ Configure::write(
         ),
     )
 );
-
-/**
- *  Michelle's Cookbook App Version Number
- *  @version     0.2.1
- */
-// Configure::write('Cookbook.version', '0.9.2');
 
 /**
  * Cache Engine Configuration
