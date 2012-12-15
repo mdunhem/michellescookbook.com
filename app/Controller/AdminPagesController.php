@@ -34,6 +34,8 @@ class AdminPagesController extends AppController {
 
     public $uses = array('User', 'Group');
 
+    public $layout = 'admin';
+
     /**
      * Change a few values before calling parent __construct
      */
@@ -43,7 +45,35 @@ class AdminPagesController extends AppController {
 
     public function beforeFilter() {
         parent::beforeFilter();
-        $this->Auth->allow('index');
+        // $this->Auth->allow('index');
+    }
+
+    public function dashboard() {
+        $this->set(
+            array(
+                'title_for_layout' => 'Admin - Users',
+            )
+        );
+    }
+
+    public function listUsers() {
+        $this->User->recursive = 0;
+        $this->set(
+            array(
+                'title_for_layout' => 'Admin - Users',
+                'users' => $this->paginate('User')
+            )
+        );
+    }
+
+    public function listGroups() {
+        $this->Group->recursive = 0;
+        $this->set(
+            array(
+                'title_for_layout' => 'Admin - Groups',
+                'groups' => $this->paginate('Group')
+            )
+        );
     }
 
     /**

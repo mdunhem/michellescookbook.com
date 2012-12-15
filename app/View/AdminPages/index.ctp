@@ -13,18 +13,28 @@
 ?>
 
 <div class="row-fluid">
-    <div class="span12">
-        <div class="well">
-            <div class="row-fluid">
-                <div class="span2">
-                    <ul class="nav nav-tabs nav-stacked">
-                        <li><a>Test</a></li>
-                        <li><a>Test</a></li>
-                        <li><a>Test</a></li>
-                    </ul>
-                </div>
+    <div class="span3">
+        <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+                <li class="nav-header">Sidebar</li>
+                <li><?php echo $this->Html->link('Dashboard', array('controller' => 'adminpages', 'action' => 'dashboard')) ?></li>
+                <li><?php echo $this->Html->link('Users', array('controller' => 'adminpages', 'action' => 'listUsers')) ?></li>
+                <li><?php echo $this->Html->link('Groups', array('controller' => 'adminpages', 'action' => 'listGroups')) ?></li>
+            </ul>
+          </div><!--/.well -->
+          <?php /*
+        <ul data-role="listview" data-inset="true">
+            <li><?php echo $this->Html->link('Dashboard', array('controller' => 'adminpages', 'action' => 'dashboard')) ?></li>
+            <li><?php echo $this->Html->link('Users', array('controller' => 'adminpages', 'action' => 'listUsers')) ?></li>
+            <li><?php echo $this->Html->link('Groups', array('controller' => 'adminpages', 'action' => 'listGroups')) ?></li>
+        </ul>
+        */ ?>
+    </div>
 
-                <div class="span10">
+    <div class="span9">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="well">
                     <?php echo $this->Session->flash() ?>
                     
                     <h2><?php echo __('You are logged in') ?>, <strong><?php echo AuthComponent::user('username') ?></strong> </h2>
@@ -72,7 +82,6 @@
         </div>
     </div>
 </div>
-
 <div class="modal hide" id="UsersModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
