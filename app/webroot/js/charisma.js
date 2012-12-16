@@ -57,7 +57,9 @@ $(document).ready(function(){
 			url:State.url,
 			success:function(msg){
 				$('#content').html($(msg).find('#content').html());
+				$('#bufferedScripts').html($(msg).find('#bufferedScripts').html());
 				$('#loading').remove();
+				$('#bufferedScripts').fadeIn();
 				$('#content').fadeIn();
 				docReady();
 			}

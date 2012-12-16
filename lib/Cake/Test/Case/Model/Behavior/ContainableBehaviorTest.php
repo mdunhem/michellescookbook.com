@@ -262,6 +262,43 @@ class ContainableBehaviorTest extends CakeTestCase {
 	}
 
 /**
+ * testContainFindList method
+ *
+ * @return void
+ */
+	public function testContainFindList() {
+		$this->Article->contain('Comment.User');
+		$result = $this->Article->find('list');
+		$expected = array(
+			1 => 'First Article',
+			2 => 'Second Article',
+			3 => 'Third Article'
+		);
+		$this->assertEquals($expected, $result);
+
+		$result = $this->Article->find('list', array('fields' => array('Article.id', 'User.id'), 'contain' => array('User')));
+		$expected = array(
+			1 => '1',
+			2 => '3',
+			3 => '1'
+		);
+		$this->assertEquals($expected, $result);
+	}
+
+/**
+ * Test that mixing contain() and the contain find option.
+ *
+ * @return void
+ */
+	public function testContainAndContainOption() {
+		$this->Article->contain();
+		$r = $this->Article->find('all', array(
+			'contain' => array('Comment')
+		));
+		$this->assertTrue(isset($r[0]['Comment']), 'No comment returned');
+	}
+
+/**
  * testFindEmbeddedNoBindings method
  *
  * @return void
@@ -2980,7 +3017,8 @@ class ContainableBehaviorTest extends CakeTestCase {
 				'User' => array(
 					'fields' => array('user')
 				)
-			)
+			),
+			'order' => 'Article.id ASC',
 		));
 		$this->assertTrue(isset($result[0]['Article']['title']), 'title missing %s');
 		$this->assertTrue(isset($result[0]['Article']['body']), 'body missing %s');
@@ -3003,7 +3041,10 @@ class ContainableBehaviorTest extends CakeTestCase {
 				'conditions' => array('created >=' => '2007-03-18 12:24')
 			)
 		));
-		$result = $this->Article->find('all', array('fields' => array('title'), 'order' => array('Article.id' => 'ASC')));
+		$result = $this->Article->find('all', array(
+			'fields' => array('title'),
+			'order' => array('Article.id' => 'ASC')
+		));
 		$expected = array(
 			array(
 				'Article' => array('id' => 1, 'title' => 'First Article'),
@@ -3425,18 +3466,18 @@ class ContainableBehaviorTest extends CakeTestCase {
 		$articleHabtm = array(
 			'hasAndBelongsToMany' => array(
 				'Tag' => array(
-					'className'				=> 'Tag',
-					'joinTable'				=> 'articles_tags',
-					'foreignKey'			=> 'article_id',
+					'className' => 'Tag',
+					'joinTable' => 'articles_tags',
+					'foreignKey' => 'article_id',
 					'associationForeignKey' => 'tag_id'
 				),
 				'ShortTag' => array(
-					'className'				=> 'Tag',
-					'joinTable'				=> 'articles_tags',
-					'foreignKey'			=> 'article_id',
+					'className' => 'Tag',
+					'joinTable' => 'articles_tags',
+					'foreignKey' => 'article_id',
 					'associationForeignKey' => 'tag_id',
 					// LENGHT function mysql-only, using LIKE does almost the same
-					'conditions' 			=> "ShortTag.tag LIKE '???'"
+					'conditions' => "ShortTag.tag LIKE '???'"
 				)
 			)
 		);

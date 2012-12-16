@@ -165,7 +165,9 @@
         </div><!--/.fluid-container-->
 
         <?php echo $this->Html->script(Configure::read('Cookbook.admin.js')); ?>
-        <?php echo $this->Js->writeBuffer(array('safe' => false)); ?>
+        <div id="bufferedScripts">
+            <?php echo $this->Js->writeBuffer(array('safe' => false)); ?>
+        </div>
         
     </body>
 </html>

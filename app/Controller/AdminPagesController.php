@@ -32,9 +32,20 @@ class AdminPagesController extends AppController {
      */
     public $helpers = array('Html', 'Form', 'Js', 'Session');
 
+    public $components = array('RequestHandler');
+
     public $uses = array('User', 'Group');
 
     public $layout = 'admin';
+
+    public $paginate = array(
+        'User' => array(
+            'limit' => 15,
+            'order' => array(
+                'User.id' => 'asc'
+            )
+        )
+    );
 
     /**
      * Change a few values before calling parent __construct
