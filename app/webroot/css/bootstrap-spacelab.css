@@ -3287,11 +3287,11 @@ input[type="submit"].btn.btn-mini {
   bottom: -6px;
   top: auto;
 }
-.navbar .nav li.dropdown .dropdown-toggle .caret,
+/*.navbar .nav li.dropdown .dropdown-toggle .caret,
 .navbar .nav li.dropdown.open .caret {
   border-top-color: #ffffff;
   border-bottom-color: #ffffff;
-}
+}*/
 .navbar .nav li.dropdown.active .caret {
   opacity: 1;
   filter: alpha(opacity=100);

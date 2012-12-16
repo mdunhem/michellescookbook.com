@@ -56,17 +56,28 @@ class AdminPagesController extends AppController {
         );
     }
 
-    public function listUsers() {
+    public function users() {
+        if ($this->request->is('post')) {
+            $this->User->create();
+            if ($this->User->save($this->request->data)) {
+                $this->Session->setFlash('The user has been saved', 'flashSuccess');
+                unset($this->request->data);
+            } else {
+                $this->Session->setFlash('The user could not be saved. Please, try again.', 'flashError');
+            }
+        }
+
         $this->User->recursive = 0;
         $this->set(
             array(
                 'title_for_layout' => 'Admin - Users',
-                'users' => $this->paginate('User')
+                'users' => $this->paginate('User'),
+                'groups' => $this->User->Group->find('list')
             )
         );
     }
 
-    public function listGroups() {
+    public function groups() {
         $this->Group->recursive = 0;
         $this->set(
             array(
