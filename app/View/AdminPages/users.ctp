@@ -4,10 +4,12 @@
  */
 
 $this->Paginator->options(array(
-    'update' => '#usersTable',
+    'update' => '#content',
     'before' => $this->Js->get('#busy-indicator')->effect('fadeIn', array('buffer' => false)),
     'complete' => $this->Js->get('#busy-indicator')->effect('fadeOut', array('buffer' => false)),
 ));
+
+Debugger::log($this->Paginator->params());
 
 ?>
 
@@ -16,8 +18,11 @@ $this->Paginator->options(array(
         <div class="well">
             <div class="row-fluid">
                 <div class="span12">
+                    <!-- <div id="busy-indicator" class="center">Loading...<div class="center"></div></div> -->
+                    <?php echo $this->Html->div('center', 'Loading...', array('id' => 'busy-indicator')); ?>
                     <h3><?php echo __('All Users')?></h3>
                     <hr>
+                    <?php echo $this->element('pager'); ?>
                     <div id="usersTable">
                         <table class="table table-bordered">
                             <thead>
@@ -65,47 +70,9 @@ $this->Paginator->options(array(
                             )
                         ); ?>
                     </p>
+
                     <?php echo $this->element('pager'); ?>
-                    <?php /*
-                    <div class="pagination pagination-centered">
-                        <ul>
-                            <?php
-                            if ($this->Paginator->hasPrev('User')) {
-                                echo $this->Paginator->prev(
-                                    '< ' . __('previous'),
-                                    array(
-                                        'tag' => 'li'
-                                    ),
-                                    null,
-                                    array(
-                                        'class' => 'disabled',
-                                        'tag' => 'li'
-                                    )
-                                );
-                            }
-                                
-                                echo $this->Paginator->numbers(
-                                    array(
-                                        'separator' => '',
-                                        'tag' => 'li',
-                                        'currentClass' => 'active'
-                                    )
-                                );
-                                echo $this->Paginator->next(
-                                    __('next') . ' >',
-                                    array(
-                                        'tag' => 'li'
-                                    ),
-                                    null,
-                                    array(
-                                        'class' => 'disabled',
-                                        'tag' => 'li'
-                                    )
-                                );
-                            ?>
-                        </ul>
-                    </div>
-                    */ ?>
+
                 </div>
             </div>
             <hr>
@@ -157,7 +124,5 @@ $this->Paginator->options(array(
         <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo __('Cancel') ?></button>
         <?php echo $this->Html->link(__('Delete'),'/users/delete/0',array('class' => 'btn btn-danger delete-user-link')) ?>
     </div>
-
-    <?php echo $this->Html->image('ajax-loader.gif', array('id' => 'busy-indicator')); ?>
 </div>
 

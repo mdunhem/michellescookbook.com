@@ -67,7 +67,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="index.html">
+                    <a class="brand" href="/admin">
                         Dashboard
                     </a>
                     
@@ -75,7 +75,7 @@
                     <div class="nav-collapse collapse">
                         <ul class="nav">
                             <li class="divider-vertical"></li>
-                            <li class="active"><a href="/">Home</a></li>
+                            <li><a href="/">Home</a></li>
                         </ul>
                         <ul class="nav pull-right">
                             <li class="dropdown">
@@ -105,12 +105,12 @@
                     <div class="well sidebar-nav">
                         <ul class="nav nav-tabs nav-stacked main-menu">
                             <li class="nav-header hidden-tablet">Main</li>
-                            <li><a class="ajax-link" href="/admin"><i class="icon-home"></i><span class="hidden-tablet"> Dashboard</span></a></li>
-                            <li><a class="ajax-link" href="/admin/users"><i class="icon-eye-open"></i><span class="hidden-tablet"> Users</span></a></li>
-                            <li><a class="ajax-link" href="/admin/listGroups"><i class="icon-edit"></i><span class="hidden-tablet"> Groups</span></a></li>
-                            <li><a class="ajax-link" href="chart.html"><i class="icon-list-alt"></i><span class="hidden-tablet"> Charts</span></a></li>
-                            <li><a class="ajax-link" href="typography.html"><i class="icon-font"></i><span class="hidden-tablet"> Typography</span></a></li>
-                            <li><a class="ajax-link" href="gallery.html"><i class="icon-picture"></i><span class="hidden-tablet"> Gallery</span></a></li>
+                            <li><a class="" href="/admin"><i class="icon-home"></i><span class="hidden-tablet"> Dashboard</span></a></li>
+                            <li><a class="" href="/admin/users"><i class="icon-eye-open"></i><span class="hidden-tablet"> Users</span></a></li>
+                            <li><a class="" href="/admin/listGroups"><i class="icon-edit"></i><span class="hidden-tablet"> Groups</span></a></li>
+                            <li><a class="" href="chart.html"><i class="icon-list-alt"></i><span class="hidden-tablet"> Charts</span></a></li>
+                            <li><a class="" href="typography.html"><i class="icon-font"></i><span class="hidden-tablet"> Typography</span></a></li>
+                            <li><a class="" href="gallery.html"><i class="icon-picture"></i><span class="hidden-tablet"> Gallery</span></a></li>
                         </ul>
                         <label id="for-is-ajax" class="hidden-tablet" for="is-ajax"><input id="is-ajax" type="checkbox"> Ajax on menu</label>
                     </div><!--/.well -->

@@ -39,12 +39,12 @@ class AdminPagesController extends AppController {
     public $layout = 'admin';
 
     public $paginate = array(
-        'User' => array(
+        // 'User' => array(
             'limit' => 15,
             'order' => array(
                 'User.id' => 'asc'
             )
-        )
+        // )
     );
 
     /**
@@ -78,7 +78,7 @@ class AdminPagesController extends AppController {
             }
         }
 
-        $this->User->recursive = 0;
+        // $this->User->recursive = 0;
         $this->set(
             array(
                 'title_for_layout' => 'Admin - Users',

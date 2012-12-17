@@ -1,47 +1,16 @@
 $(document).ready(function(){
-	//themes, change CSS with JS
-	//default theme(CSS) is cerulean, change it if needed
-	var current_theme = $.cookie('current_theme')==null ? 'cerulean' :$.cookie('current_theme');
-	switch_theme(current_theme);
-	
-	$('#themes a[data-value="'+current_theme+'"]').find('i').addClass('icon-ok');
-				 
-	$('#themes a').click(function(e){
-		e.preventDefault();
-		current_theme=$(this).attr('data-value');
-		$.cookie('current_theme',current_theme,{expires:365});
-		switch_theme(current_theme);
-		$('#themes i').removeClass('icon-ok');
-		$(this).find('i').addClass('icon-ok');
-	});
-	
-	
-	function switch_theme(theme_name)
-	{
-		$('#bs-css').attr('href','css/bootstrap-'+theme_name+'.css');
-	}
 	
 	//ajax menu checkbox
-	$('#is-ajax').click(function(e){
+	$('#is-ajax').click(function(e) {
 		$.cookie('is-ajax',$(this).prop('checked'),{expires:365});
 	});
-	$('#is-ajax').prop('checked',$.cookie('is-ajax')==='true' ? true : false);
-	
-	//disbaling some functions for Internet Explorer
-	if($.browser.msie)
-	{
-		$('#is-ajax').prop('checked',false);
-		$('#for-is-ajax').hide();
-		$('#toggle-fullscreen').hide();
-		$('.login-box').find('.input-large').removeClass('span10');
-		
-	}
-	
+	$('#is-ajax').prop('checked', $.cookie('is-ajax') === 'true' ? true : false);
 	
 	//highlight current / active link
-	$('ul.main-menu li a').each(function(){
-		if($($(this))[0].href==String(window.location))
+	$('ul.main-menu li a').each(function() {
+		if($(this)[0].href == String(window.location)) {
 			$(this).parent().addClass('active');
+		}
 	});
 	
 	//establish history variables
@@ -68,11 +37,8 @@ $(document).ready(function(){
 	
 	//ajaxify menus
 	$('a.ajax-link').click(function(e){
-		if($.browser.msie) e.which=1;
-		if(e.which!=1 || !$('#is-ajax').prop('checked') || $(this).parent().hasClass('active')) return;
 		e.preventDefault();
-		if($('.btn-navbar').is(':visible'))
-		{
+		if($('.btn-navbar').is(':visible')) {
 			$('.btn-navbar').click();
 		}
 		$('#loading').remove();
