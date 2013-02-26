@@ -295,9 +295,9 @@ class Debugger {
 		$back = array();
 
 		$_trace = array(
-			'line'     => '??',
-			'file'     => '[internal]',
-			'class'    => null,
+			'line' => '??',
+			'file' => '[internal]',
+			'class' => null,
 			'function' => '[main]'
 		);
 
@@ -317,7 +317,7 @@ class Debugger {
 						foreach ($next['args'] as $arg) {
 							$args[] = Debugger::exportVar($arg);
 						}
-						$reference .= join(', ', $args);
+						$reference .= implode(', ', $args);
 					}
 					$reference .= ')';
 				}
@@ -395,10 +395,15 @@ class Debugger {
 		if (!file_exists($file)) {
 			return array();
 		}
-		$data = @explode("\n", file_get_contents($file));
-
-		if (empty($data) || !isset($data[$line])) {
-			return;
+		$data = file_get_contents($file);
+		if (empty($data)) {
+			return $lines;
+		}
+		if (strpos($data, "\n") !== false) {
+			$data = explode("\n", $data);
+		}
+		if (!isset($data[$line])) {
+			return $lines;
 		}
 		for ($i = $line - ($context + 1); $i < $line + $context; $i++) {
 			if (!isset($data[$i])) {
@@ -422,13 +427,23 @@ class Debugger {
  * @return string
  */
 	protected static function _highlight($str) {
-		static $supportHighlight = null;
-		if (!$supportHighlight && function_exists('hphp_log')) {
-			$supportHighlight = false;
+		if (function_exists('hphp_log')) {
 			return htmlentities($str);
 		}
-		$supportHighlight = true;
-		return highlight_string($str, true);
+		$added = false;
+		if (strpos($str, '<?php') === false) {
+			$added = true;
+			$str = "<?php \n" . $str;
+		}
+		$highlight = highlight_string($str, true);
+		if ($added) {
+			$highlight = str_replace(
+				'&lt;?php&nbsp;<br />',
+				'',
+				$highlight
+			);
+		}
+		return $highlight;
 	}
 
 /**
@@ -474,7 +489,7 @@ class Debugger {
 			case 'float':
 				return '(float) ' . $var;
 			case 'string':
-				if (trim($var) == '') {
+				if (!trim($var)) {
 					return "''";
 				}
 				return "'" . $var . "'";
@@ -510,7 +525,7 @@ class Debugger {
 	protected static function _array(array $var, $depth, $indent) {
 		$secrets = array(
 			'password' => '*****',
-			'login'  => '*****',
+			'login' => '*****',
 			'host' => '*****',
 			'database' => '*****',
 			'port' => '*****',
@@ -571,6 +586,31 @@ class Debugger {
 				$value = self::_export($value, $depth - 1, $indent);
 				$props[] = "$key => " . $value;
 			}
+
+			if (version_compare(PHP_VERSION, '5.3.0') >= 0) {
+				$ref = new ReflectionObject($var);
+
+				$reflectionProperties = $ref->getProperties(ReflectionProperty::IS_PROTECTED);
+				foreach ($reflectionProperties as $reflectionProperty) {
+					$reflectionProperty->setAccessible(true);
+					$property = $reflectionProperty->getValue($var);
+
+					$value = self::_export($property, $depth - 1, $indent);
+					$key = $reflectionProperty->name;
+					$props[] = "[protected] $key => " . $value;
+				}
+
+				$reflectionProperties = $ref->getProperties(ReflectionProperty::IS_PRIVATE);
+				foreach ($reflectionProperties as $reflectionProperty) {
+					$reflectionProperty->setAccessible(true);
+					$property = $reflectionProperty->getValue($var);
+
+					$value = self::_export($property, $depth - 1, $indent);
+					$key = $reflectionProperty->name;
+					$props[] = "[private] $key => " . $value;
+				}
+			}
+
 			$out .= $break . implode($break, $props) . $end;
 		}
 		$out .= '}';
@@ -753,11 +793,11 @@ class Debugger {
 				continue;
 			}
 			if (is_array($value)) {
-				$value = join("\n", $value);
+				$value = implode("\n", $value);
 			}
 			$info .= String::insert($tpl[$key], array($key => $value) + $data, $insertOpts);
 		}
-		$links = join(' ', $links);
+		$links = implode(' ', $links);
 
 		if (isset($tpl['callback']) && is_callable($tpl['callback'])) {
 			return call_user_func($tpl['callback'], $data, compact('links', 'info'));

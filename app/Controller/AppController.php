@@ -66,6 +66,18 @@ class AppController extends Controller {
                         ),
                         array(
                             'url' => array(
+                                'title' => 'Admin',
+                                'url' => array(
+                                    'controller' => 'adminpages',
+                                    'action' => 'dashboard'
+                                ),
+                                'options' => array(
+                                    'data-ajax' => 'false'
+                                )
+                            )
+                        ),
+                        array(
+                            'url' => array(
                                 'title' => 'Edit Users',
                                 'url' => array(
                                     'controller' => 'users',

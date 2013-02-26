@@ -16,6 +16,19 @@
     }
 }());
 
+(function() {
+    $('.btn-remove-modal').on('click', function(event) {
+        var id = $(event.target).data('deleteId'),
+            name = $(event.target).attr('data-deleteName');
+
+        console.log(event);
+        console.log(name);
+
+        // $('.delete-modal-id').html(id);
+        $('.delete-modal-name').html(name);
+    });
+}());
+
 //Place any jQuery/helper plugins in here.
 (function() {
 

@@ -23,6 +23,9 @@
     Router::connect('/users', array('controller' => 'users'));
     Router::connect('/users/:action/*', array('controller' => 'users'));
 
+    Router::connect('/admin', array('controller' => 'adminpages', 'action' => 'dashboard'));
+    Router::connect('/admin/:action/*', array('controller' => 'adminpages'));
+
     /**
      * Next connect all requests to the GroupsController
      */

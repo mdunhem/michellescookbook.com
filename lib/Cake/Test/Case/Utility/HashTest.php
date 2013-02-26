@@ -298,7 +298,6 @@ class HashTest extends CakeTestCase {
 				'Author' => array('id' => '3', 'user' => 'larry', 'password' => null),
 			)
 		);
-
 		$result = Hash::flatten($data);
 		$expected = array(
 			'0.Post.id' => '1',
@@ -314,6 +313,21 @@ class HashTest extends CakeTestCase {
 			'1.Author.id' => '3',
 			'1.Author.user' => 'larry',
 			'1.Author.password' => null
+		);
+		$this->assertEquals($expected, $result);
+
+		$data = array(
+			array(
+				'Post' => array('id' => '1', 'author_id' => null, 'title' => 'First Post'),
+				'Author' => array(),
+			)
+		);
+		$result = Hash::flatten($data);
+		$expected = array(
+			'0.Post.id' => '1',
+			'0.Post.author_id' => null,
+			'0.Post.title' => 'First Post',
+			'0.Author' => array()
 		);
 		$this->assertEquals($expected, $result);
 
@@ -645,6 +659,9 @@ class HashTest extends CakeTestCase {
 
 		$result = Hash::extract($data, '1.Article.title');
 		$this->assertEquals(array('Second Article'), $result);
+
+		$result = Hash::extract(array(false), '{n}.Something.another_thing');
+		$this->assertEquals(array(), $result);
 	}
 
 /**
@@ -914,6 +931,9 @@ class HashTest extends CakeTestCase {
  * @return void
  */
 	public function testSort() {
+		$result = Hash::sort(array(), '{n}.name', 'asc');
+		$this->assertEquals(array(), $result);
+
 		$a = array(
 			0 => array(
 				'Person' => array('name' => 'Jeff'),
@@ -2146,6 +2166,18 @@ class HashTest extends CakeTestCase {
 			)
 		);
 		$this->assertEquals($result, $expected);
+
+		$data = array('a.b.100.a' => null, 'a.b.200.a' => null);
+		$expected = array(
+			'a' => array(
+				'b' => array(
+					100 => array('a' => null),
+					200 => array('a' => null)
+				)
+			)
+		);
+		$result = Hash::expand($data);
+		$this->assertEquals($expected, $result);
 	}
 
 }

@@ -116,6 +116,7 @@
         )
     );
     
+    echo $this->Js->writeBuffer(array('onDomReady' => false, 'safe' => false));
     // End of page div
     echo '</div>';
 
@@ -131,7 +132,8 @@
 
     echo $this->fetch('script');
 
-    echo $this->Js->writeBuffer(array('safe' => false));
+    echo $this->Html->script(Configure::read('Cookbook.js'));
+    
 ?>
     </body>
 </html>

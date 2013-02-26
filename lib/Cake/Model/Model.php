@@ -236,6 +236,13 @@ class Model extends Object implements CakeEventListener {
 	public $tablePrefix = null;
 
 /**
+ * Plugin model belongs to.
+ *
+ * @var string
+ */
+	public $plugin = null;
+
+/**
  * Name of the model.
  *
  * @var string
@@ -558,6 +565,8 @@ class Model extends Object implements CakeEventListener {
  */
 	protected $_associations = array('belongsTo', 'hasOne', 'hasMany', 'hasAndBelongsToMany');
 
+// @codingStandardsIgnoreStart
+
 /**
  * Holds model associations temporarily to allow for dynamic (un)binding.
  *
@@ -585,6 +594,8 @@ class Model extends Object implements CakeEventListener {
  * @var array
  */
 	public $__backContainableAssociation = array();
+
+// @codingStandardsIgnoreEnd
 
 /**
  * The ID of the model record that was last inserted.
@@ -665,10 +676,14 @@ class Model extends Object implements CakeEventListener {
 			extract(array_merge(
 				array(
 					'id' => $this->id, 'table' => $this->useTable, 'ds' => $this->useDbConfig,
-					'name' => $this->name, 'alias' => $this->alias
+					'name' => $this->name, 'alias' => $this->alias, 'plugin' => $this->plugin
 				),
 				$id
 			));
+		}
+
+		if ($this->plugin === null) {
+			$this->plugin = (isset($plugin) ? $plugin : $this->plugin);
 		}
 
 		if ($this->name === null) {
@@ -716,7 +731,7 @@ class Model extends Object implements CakeEventListener {
 				$this->useTable = Inflector::tableize($this->name);
 			}
 
-			if ($this->displayField == null) {
+			if (!$this->displayField) {
 				unset($this->displayField);
 			}
 			$this->table = $this->useTable;
@@ -1082,7 +1097,7 @@ class Model extends Object implements CakeEventListener {
 	}
 
 /**
- * Sets a custom table for your controller class. Used by your controller to select a database table.
+ * Sets a custom table for your model class. Used by your controller to select a database table.
  *
  * @param string $tableName Name of the custom table
  * @throws MissingTableException when database table $tableName is not found on data source
@@ -1219,72 +1234,74 @@ class Model extends Object implements CakeEventListener {
 
 		$type = $this->getColumnType($field);
 
-		if (in_array($type, array('datetime', 'timestamp', 'date', 'time'))) {
-			$useNewDate = (isset($data['year']) || isset($data['month']) ||
-				isset($data['day']) || isset($data['hour']) || isset($data['minute']));
+		if (!in_array($type, array('datetime', 'timestamp', 'date', 'time'))) {
+			return $data;
+		}
 
-			$dateFields = array('Y' => 'year', 'm' => 'month', 'd' => 'day', 'H' => 'hour', 'i' => 'min', 's' => 'sec');
-			$timeFields = array('H' => 'hour', 'i' => 'min', 's' => 'sec');
-			$date = array();
+		$useNewDate = (isset($data['year']) || isset($data['month']) ||
+			isset($data['day']) || isset($data['hour']) || isset($data['minute']));
 
-			if (isset($data['meridian']) && empty($data['meridian'])) {
-				return null;
-			}
+		$dateFields = array('Y' => 'year', 'm' => 'month', 'd' => 'day', 'H' => 'hour', 'i' => 'min', 's' => 'sec');
+		$timeFields = array('H' => 'hour', 'i' => 'min', 's' => 'sec');
+		$date = array();
 
-			if (
-				isset($data['hour']) &&
-				isset($data['meridian']) &&
-				!empty($data['hour']) &&
-				$data['hour'] != 12 &&
-				'pm' == $data['meridian']
-			) {
-				$data['hour'] = $data['hour'] + 12;
+		if (isset($data['meridian']) && empty($data['meridian'])) {
+			return null;
+		}
+
+		if (
+			isset($data['hour']) &&
+			isset($data['meridian']) &&
+			!empty($data['hour']) &&
+			$data['hour'] != 12 &&
+			'pm' == $data['meridian']
+		) {
+			$data['hour'] = $data['hour'] + 12;
+		}
+		if (isset($data['hour']) && isset($data['meridian']) && $data['hour'] == 12 && 'am' == $data['meridian']) {
+			$data['hour'] = '00';
+		}
+		if ($type == 'time') {
+			foreach ($timeFields as $key => $val) {
+				if (!isset($data[$val]) || $data[$val] === '0' || $data[$val] === '00') {
+					$data[$val] = '00';
+				} elseif ($data[$val] !== '') {
+					$data[$val] = sprintf('%02d', $data[$val]);
+				}
+				if (!empty($data[$val])) {
+					$date[$key] = $data[$val];
+				} else {
+					return null;
+				}
 			}
-			if (isset($data['hour']) && isset($data['meridian']) && $data['hour'] == 12 && 'am' == $data['meridian']) {
-				$data['hour'] = '00';
-			}
-			if ($type == 'time') {
-				foreach ($timeFields as $key => $val) {
+		}
+
+		if ($type == 'datetime' || $type == 'timestamp' || $type == 'date') {
+			foreach ($dateFields as $key => $val) {
+				if ($val == 'hour' || $val == 'min' || $val == 'sec') {
 					if (!isset($data[$val]) || $data[$val] === '0' || $data[$val] === '00') {
 						$data[$val] = '00';
-					} elseif ($data[$val] !== '') {
+					} else {
 						$data[$val] = sprintf('%02d', $data[$val]);
 					}
-					if (!empty($data[$val])) {
-						$date[$key] = $data[$val];
-					} else {
-						return null;
-					}
+				}
+				if (!isset($data[$val]) || isset($data[$val]) && (empty($data[$val]) || $data[$val][0] === '-')) {
+					return null;
+				}
+				if (isset($data[$val]) && !empty($data[$val])) {
+					$date[$key] = $data[$val];
 				}
 			}
+		}
 
-			if ($type == 'datetime' || $type == 'timestamp' || $type == 'date') {
-				foreach ($dateFields as $key => $val) {
-					if ($val == 'hour' || $val == 'min' || $val == 'sec') {
-						if (!isset($data[$val]) || $data[$val] === '0' || $data[$val] === '00') {
-							$data[$val] = '00';
-						} else {
-							$data[$val] = sprintf('%02d', $data[$val]);
-						}
-					}
-					if (!isset($data[$val]) || isset($data[$val]) && (empty($data[$val]) || $data[$val][0] === '-')) {
-						return null;
-					}
-					if (isset($data[$val]) && !empty($data[$val])) {
-						$date[$key] = $data[$val];
-					}
+		if ($useNewDate && !empty($date)) {
+			$format = $this->getDataSource()->columns[$type]['format'];
+			foreach (array('m', 'd', 'H', 'i', 's') as $index) {
+				if (isset($date[$index])) {
+					$date[$index] = sprintf('%02d', $date[$index]);
 				}
 			}
-
-			if ($useNewDate && !empty($date)) {
-				$format = $this->getDataSource()->columns[$type]['format'];
-				foreach (array('m', 'd', 'H', 'i', 's') as $index) {
-					if (isset($date[$index])) {
-						$date[$index] = sprintf('%02d', $date[$index]);
-					}
-				}
-				return str_replace(array_keys($date), array_values($date), $format);
-			}
+			return str_replace(array_keys($date), array_values($date), $format);
 		}
 		return $data;
 	}
@@ -1306,14 +1323,13 @@ class Model extends Object implements CakeEventListener {
 				$this->_schema = array();
 			}
 		}
-		if (is_string($field)) {
-			if (isset($this->_schema[$field])) {
-				return $this->_schema[$field];
-			} else {
-				return null;
-			}
+		if (!is_string($field)) {
+			return $this->_schema;
 		}
-		return $this->_schema;
+		if (isset($this->_schema[$field])) {
+			return $this->_schema[$field];
+		}
+		return null;
 	}
 
 /**
@@ -1379,17 +1395,15 @@ class Model extends Object implements CakeEventListener {
 			return false;
 		}
 
-		if ($checkVirtual && !empty($this->virtualFields)) {
-			if ($this->isVirtualField($name)) {
-				return true;
-			}
+		if ($checkVirtual && !empty($this->virtualFields) && $this->isVirtualField($name)) {
+			return true;
 		}
 
 		if (empty($this->_schema)) {
 			$this->schema();
 		}
 
-		if ($this->_schema != null) {
+		if ($this->_schema) {
 			return isset($this->_schema[$name]);
 		}
 		return false;
@@ -1406,10 +1420,7 @@ class Model extends Object implements CakeEventListener {
 		if (method_exists($this, $method)) {
 			return true;
 		}
-		if ($this->Behaviors->hasMethod($method)) {
-			return true;
-		}
-		return false;
+		return $this->Behaviors->hasMethod($method);
 	}
 
 /**
@@ -1443,12 +1454,12 @@ class Model extends Object implements CakeEventListener {
  *    or false if none $field exist.
  */
 	public function getVirtualField($field = null) {
-		if ($field == null) {
+		if (!$field) {
 			return empty($this->virtualFields) ? false : $this->virtualFields;
 		}
 		if ($this->isVirtualField($field)) {
 			if (strpos($field, '.') !== false) {
-				list($model, $field) = explode('.', $field);
+				list(, $field) = pluginSplit($field);
 			}
 			return $this->virtualFields[$field];
 		}
@@ -1499,7 +1510,7 @@ class Model extends Object implements CakeEventListener {
 	public function read($fields = null, $id = null) {
 		$this->validationErrors = array();
 
-		if ($id != null) {
+		if ($id) {
 			$this->id = $id;
 		}
 
@@ -1515,9 +1526,8 @@ class Model extends Object implements CakeEventListener {
 				'fields' => $fields
 			));
 			return $this->data;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 /**
@@ -1534,28 +1544,27 @@ class Model extends Object implements CakeEventListener {
 		if ($conditions === null && $this->id !== false) {
 			$conditions = array($this->alias . '.' . $this->primaryKey => $this->id);
 		}
+		$recursive = $this->recursive;
 		if ($this->recursive >= 1) {
 			$recursive = -1;
-		} else {
-			$recursive = $this->recursive;
 		}
 		$fields = $name;
-		if ($data = $this->find('first', compact('conditions', 'fields', 'order', 'recursive'))) {
-			if (strpos($name, '.') === false) {
-				if (isset($data[$this->alias][$name])) {
-					return $data[$this->alias][$name];
-				}
-			} else {
-				$name = explode('.', $name);
-				if (isset($data[$name[0]][$name[1]])) {
-					return $data[$name[0]][$name[1]];
-				}
-			}
-			if (isset($data[0]) && count($data[0]) > 0) {
-				return array_shift($data[0]);
+		$data = $this->find('first', compact('conditions', 'fields', 'order', 'recursive'));
+		if (!$data) {
+			return false;
+		}
+		if (strpos($name, '.') === false) {
+			if (isset($data[$this->alias][$name])) {
+				return $data[$this->alias][$name];
 			}
 		} else {
-			return false;
+			$name = explode('.', $name);
+			if (isset($data[$name[0]][$name[1]])) {
+				return $data[$name[0]][$name[1]];
+			}
+		}
+		if (isset($data[0]) && count($data[0]) > 0) {
+			return array_shift($data[0]);
 		}
 	}
 
@@ -1565,7 +1574,9 @@ class Model extends Object implements CakeEventListener {
  *
  * @param string $name Name of the table field
  * @param mixed $value Value of the field
- * @param array $validate See $options param in Model::save(). Does not respect 'fieldList' key if passed
+ * @param boolean|array $validate Either a boolean, or an array.
+ *   If a boolean, indicates whether or not to validate before saving.
+ *   If an array, allows control of 'validate' and 'callbacks' options.
  * @return boolean See Model::save()
  * @see Model::save()
  * @link http://book.cakephp.org/2.0/en/models/saving-your-data.html#model-savefield-string-fieldname-string-fieldvalue-validate-false
@@ -1574,10 +1585,9 @@ class Model extends Object implements CakeEventListener {
 		$id = $this->id;
 		$this->create(false);
 
+		$options = array('validate' => $validate, 'fieldList' => array($name));
 		if (is_array($validate)) {
 			$options = array_merge(array('validate' => false, 'fieldList' => array($name)), $validate);
-		} else {
-			$options = array('validate' => $validate, 'fieldList' => array($name));
 		}
 		return $this->save(array($this->alias => array($this->primaryKey => $id, $name => $value)), $options);
 	}
@@ -1606,10 +1616,9 @@ class Model extends Object implements CakeEventListener {
 		}
 
 		if (!empty($options['fieldList'])) {
+			$this->whitelist = $options['fieldList'];
 			if (!empty($options['fieldList'][$this->alias]) && is_array($options['fieldList'][$this->alias])) {
 				$this->whitelist = $options['fieldList'][$this->alias];
-			} else {
-				$this->whitelist = $options['fieldList'];
 			}
 		} elseif ($options['fieldList'] === null) {
 			$this->whitelist = array();
@@ -1728,7 +1737,7 @@ class Model extends Object implements CakeEventListener {
 				}
 
 				if (!$db->create($this, $fields, $values)) {
-					$success = $created = false;
+					$success = false;
 				} else {
 					$created = true;
 				}
@@ -1741,6 +1750,10 @@ class Model extends Object implements CakeEventListener {
 
 		if (!empty($joined) && $success === true) {
 			$this->_saveMulti($joined, $this->id, $db);
+		}
+
+		if ($success && $count === 0) {
+			$success = false;
 		}
 
 		if ($success && $count > 0) {
@@ -1870,7 +1883,7 @@ class Model extends Object implements CakeEventListener {
 					if ($keepExisting && !empty($links)) {
 						foreach ($links as $link) {
 							$oldJoin = $link[$join][$this->hasAndBelongsToMany[$assoc]['associationForeignKey']];
-							if (! in_array($oldJoin, $newJoins) ) {
+							if (!in_array($oldJoin, $newJoins)) {
 								$conditions[$associationForeignKey] = $oldJoin;
 								$db->delete($this->{$join}, $conditions);
 							} else {
@@ -2017,7 +2030,7 @@ class Model extends Object implements CakeEventListener {
  * @link http://book.cakephp.org/2.0/en/models/saving-your-data.html#model-saveassociated-array-data-null-array-options-array
  * @link http://book.cakephp.org/2.0/en/models/saving-your-data.html#model-saveall-array-data-null-array-options-array
  */
-	public function saveAll($data, $options = array()) {
+	public function saveAll($data = array(), $options = array()) {
 		$options = array_merge(array('validate' => 'first'), $options);
 		if (Hash::numeric(array_keys($data))) {
 			if ($options['validate'] === 'only') {
@@ -2107,9 +2120,8 @@ class Model extends Object implements CakeEventListener {
 		if ($validates) {
 			if ($transactionBegun) {
 				return $db->commit() !== false;
-			} else {
-				return true;
 			}
+			return true;
 		}
 		$db->rollback();
 		return false;
@@ -2130,8 +2142,7 @@ class Model extends Object implements CakeEventListener {
  *
  * @param array $data Record data to validate. This should be a numerically-indexed array
  * @param array $options Options to use when validating record data (see above), See also $options of validates().
- * @return boolean True on success, or false on failure.
- * @return mixed If atomic: True on success, or false on failure.
+ * @return boolean|array If atomic: True on success, or false on failure.
  *    Otherwise: array similar to the $data array passed, but values are set to true/false
  *    depending on whether each record validated successfully.
  */
@@ -2183,7 +2194,7 @@ class Model extends Object implements CakeEventListener {
 
 		if ($options['validate'] === 'first') {
 			$validates = $this->validateAssociated($data, $options);
-			if ((!$validates && $options['atomic']) || (!$options['atomic'] && in_array(false, $validates, true))) {
+			if ((!$validates && $options['atomic']) || (!$options['atomic'] && in_array(false, Hash::flatten($validates), true))) {
 				return $validates;
 			}
 			$options['validate'] = false;
@@ -2216,6 +2227,7 @@ class Model extends Object implements CakeEventListener {
 					} else {
 						$data = array_merge(array($key => $this->{$association}->id), $data, array($key => $this->{$association}->id));
 					}
+					$options = $this->_addToWhiteList($key, $options);
 				} else {
 					$validationErrors[$association] = $this->{$association}->validationErrors;
 				}
@@ -2246,6 +2258,7 @@ class Model extends Object implements CakeEventListener {
 						$validates = $this->{$association}->create(null) !== null;
 						$saved = false;
 						if ($validates) {
+							$options = $this->{$association}->_addToWhiteList($key, $options);
 							if ($options['deep']) {
 								$saved = $this->{$association}->saveAssociated($values, array_merge($options, array('atomic' => false)));
 							} else {
@@ -2266,6 +2279,7 @@ class Model extends Object implements CakeEventListener {
 								$values[$i] = array_merge(array($key => $this->id), $value, array($key => $this->id));
 							}
 						}
+						$options = $this->{$association}->_addToWhiteList($key, $options);
 						$_return = $this->{$association}->saveMany($values, array_merge($options, array('atomic' => false)));
 						if (in_array(false, $_return, true)) {
 							$validationErrors[$association] = $this->{$association}->validationErrors;
@@ -2290,12 +2304,34 @@ class Model extends Object implements CakeEventListener {
 		if ($validates) {
 			if ($transactionBegun) {
 				return $db->commit() !== false;
-			} else {
-				return true;
 			}
+			return true;
 		}
 		$db->rollback();
 		return false;
+	}
+
+/**
+ * Helper method for saveAll() and friends, to add foreign key to fieldlist
+ *
+ * @param string $key fieldname to be added to list
+ * @param array $options
+ * @return array $options
+ */
+	protected function _addToWhiteList($key, $options) {
+		if (empty($options['fieldList']) && $this->whitelist && !in_array($key, $this->whitelist)) {
+			$options['fieldList'][$this->alias] = $this->whitelist;
+			$options['fieldList'][$this->alias][] = $key;
+			return $options;
+		}
+		if (!empty($options['fieldList'][$this->alias]) && is_array($options['fieldList'][$this->alias])) {
+			$options['fieldList'][$this->alias][] = $key;
+			return $options;
+		}
+		if (!empty($options['fieldList']) && is_array($options['fieldList'])) {
+			$options['fieldList'][] = $key;
+		}
+		return $options;
 	}
 
 /**
@@ -2351,45 +2387,44 @@ class Model extends Object implements CakeEventListener {
 		$event = new CakeEvent('Model.beforeDelete', $this, array($cascade));
 		list($event->break, $event->breakOn) = array(true, array(false, null));
 		$this->getEventManager()->dispatch($event);
-		if (!$event->isStopped()) {
-			if (!$this->exists()) {
-				return false;
-			}
-			$db = $this->getDataSource();
+		if ($event->isStopped()) {
+			return false;
+		}
+		if (!$this->exists()) {
+			return false;
+		}
 
-			$this->_deleteDependent($id, $cascade);
-			$this->_deleteLinks($id);
-			$this->id = $id;
+		$this->_deleteDependent($id, $cascade);
+		$this->_deleteLinks($id);
+		$this->id = $id;
 
-			$updateCounterCache = false;
-			if (!empty($this->belongsTo)) {
-				foreach ($this->belongsTo as $assoc) {
-					if (!empty($assoc['counterCache'])) {
-						$updateCounterCache = true;
-						break;
-					}
+		if (!empty($this->belongsTo)) {
+			foreach ($this->belongsTo as $assoc) {
+				if (empty($assoc['counterCache'])) {
+					continue;
 				}
-				if ($updateCounterCache) {
-					$keys = $this->find('first', array(
-						'fields' => $this->_collectForeignKeys(),
-						'conditions' => array($this->alias . '.' . $this->primaryKey => $id),
-						'recursive' => -1,
-						'callbacks' => false
-					));
-				}
-			}
 
-			if ($db->delete($this, array($this->alias . '.' . $this->primaryKey => $id))) {
-				if ($updateCounterCache) {
-					$this->updateCounterCache($keys[$this->alias]);
-				}
-				$this->getEventManager()->dispatch(new CakeEvent('Model.afterDelete', $this));
-				$this->_clearCache();
-				$this->id = false;
-				return true;
+				$keys = $this->find('first', array(
+					'fields' => $this->_collectForeignKeys(),
+					'conditions' => array($this->alias . '.' . $this->primaryKey => $id),
+					'recursive' => -1,
+					'callbacks' => false
+				));
+				break;
 			}
 		}
-		return false;
+
+		if (!$this->getDataSource()->delete($this, array($this->alias . '.' . $this->primaryKey => $id))) {
+			return false;
+		}
+
+		if (!empty($keys[$this->alias])) {
+			$this->updateCounterCache($keys[$this->alias]);
+		}
+		$this->getEventManager()->dispatch(new CakeEvent('Model.afterDelete', $this));
+		$this->_clearCache();
+		$this->id = false;
+		return true;
 	}
 
 /**
@@ -2400,39 +2435,42 @@ class Model extends Object implements CakeEventListener {
  * @return void
  */
 	protected function _deleteDependent($id, $cascade) {
+		if ($cascade !== true) {
+			return;
+		}
 		if (!empty($this->__backAssociation)) {
 			$savedAssociatons = $this->__backAssociation;
 			$this->__backAssociation = array();
 		}
-		if ($cascade === true) {
-			foreach (array_merge($this->hasMany, $this->hasOne) as $assoc => $data) {
-				if ($data['dependent'] === true) {
 
-					$model = $this->{$assoc};
+		foreach (array_merge($this->hasMany, $this->hasOne) as $assoc => $data) {
+			if ($data['dependent'] !== true) {
+				continue;
+			}
 
-					if ($data['foreignKey'] === false && $data['conditions'] && in_array($this->name, $model->getAssociated('belongsTo'))) {
-						$model->recursive = 0;
-						$conditions = array($this->escapeField(null, $this->name) => $id);
-					} else {
-						$model->recursive = -1;
-						$conditions = array($model->escapeField($data['foreignKey']) => $id);
-						if ($data['conditions']) {
-							$conditions = array_merge((array)$data['conditions'], $conditions);
-						}
-					}
+			$model = $this->{$assoc};
 
-					if (isset($data['exclusive']) && $data['exclusive']) {
-						$model->deleteAll($conditions);
-					} else {
-						$records = $model->find('all', array(
-							'conditions' => $conditions, 'fields' => $model->primaryKey
-						));
+			if ($data['foreignKey'] === false && $data['conditions'] && in_array($this->name, $model->getAssociated('belongsTo'))) {
+				$model->recursive = 0;
+				$conditions = array($this->escapeField(null, $this->name) => $id);
+			} else {
+				$model->recursive = -1;
+				$conditions = array($model->escapeField($data['foreignKey']) => $id);
+				if ($data['conditions']) {
+					$conditions = array_merge((array)$data['conditions'], $conditions);
+				}
+			}
 
-						if (!empty($records)) {
-							foreach ($records as $record) {
-								$model->delete($record[$model->alias][$model->primaryKey]);
-							}
-						}
+			if (isset($data['exclusive']) && $data['exclusive']) {
+				$model->deleteAll($conditions);
+			} else {
+				$records = $model->find('all', array(
+					'conditions' => $conditions, 'fields' => $model->primaryKey
+				));
+
+				if (!empty($records)) {
+					foreach ($records as $record) {
+						$model->delete($record[$model->alias][$model->primaryKey]);
 					}
 				}
 			}
@@ -2450,7 +2488,7 @@ class Model extends Object implements CakeEventListener {
  */
 	protected function _deleteLinks($id) {
 		foreach ($this->hasAndBelongsToMany as $data) {
-			list($plugin, $joinModel) = pluginSplit($data['with']);
+			list(, $joinModel) = pluginSplit($data['with']);
 			$records = $this->{$joinModel}->find('all', array(
 				'conditions' => array($this->{$joinModel}->escapeField($data['foreignKey']) => $id),
 				'fields' => $this->{$joinModel}->primaryKey,
@@ -2482,38 +2520,37 @@ class Model extends Object implements CakeEventListener {
 
 		if (!$cascade && !$callbacks) {
 			return $db->delete($this, $conditions);
-		} else {
-			$ids = $this->find('all', array_merge(array(
-				'fields' => "{$this->alias}.{$this->primaryKey}",
-				'recursive' => 0), compact('conditions'))
-			);
-			if ($ids === false) {
-				return false;
-			}
+		}
+		$ids = $this->find('all', array_merge(array(
+			'fields' => "{$this->alias}.{$this->primaryKey}",
+			'recursive' => 0), compact('conditions'))
+		);
+		if ($ids === false) {
+			return false;
+		}
 
-			$ids = Hash::extract($ids, "{n}.{$this->alias}.{$this->primaryKey}");
-			if (empty($ids)) {
-				return true;
-			}
+		$ids = Hash::extract($ids, "{n}.{$this->alias}.{$this->primaryKey}");
+		if (empty($ids)) {
+			return true;
+		}
 
-			if ($callbacks) {
-				$_id = $this->id;
-				$result = true;
-				foreach ($ids as $id) {
-					$result = ($result && $this->delete($id, $cascade));
-				}
-				$this->id = $_id;
-				return $result;
-			} else {
-				foreach ($ids as $id) {
-					$this->_deleteLinks($id);
-					if ($cascade) {
-						$this->_deleteDependent($id, $cascade);
-					}
-				}
-				return $db->delete($this, array($this->alias . '.' . $this->primaryKey => $ids));
+		if ($callbacks) {
+			$_id = $this->id;
+			$result = true;
+			foreach ($ids as $id) {
+				$result = $result && $this->delete($id, $cascade);
+			}
+			$this->id = $_id;
+			return $result;
+		}
+
+		foreach ($ids as $id) {
+			$this->_deleteLinks($id);
+			if ($cascade) {
+				$this->_deleteDependent($id, $cascade);
 			}
 		}
+		return $db->delete($this, array($this->alias . '.' . $this->primaryKey => $ids));
 	}
 
 /**
@@ -2550,9 +2587,13 @@ class Model extends Object implements CakeEventListener {
 		if ($id === false) {
 			return false;
 		}
-		$conditions = array($this->alias . '.' . $this->primaryKey => $id);
-		$query = array('conditions' => $conditions, 'recursive' => -1, 'callbacks' => false);
-		return ($this->find('count', $query) > 0);
+		return (bool)$this->find('count', array(
+			'conditions' => array(
+				$this->alias . '.' . $this->primaryKey => $id
+			),
+			'recursive' => -1,
+			'callbacks' => false
+		));
 	}
 
 /**
@@ -2562,7 +2603,7 @@ class Model extends Object implements CakeEventListener {
  * @return boolean True if such a record exists
  */
 	public function hasAny($conditions = null) {
-		return ($this->find('count', array('conditions' => $conditions, 'recursive' => -1)) != false);
+		return (bool)$this->find('count', array('conditions' => $conditions, 'recursive' => -1));
 	}
 
 /**
@@ -2613,9 +2654,12 @@ class Model extends Object implements CakeEventListener {
  *
  *  Note: find(list) + database views have issues with MySQL 5.0. Try upgrading to MySQL 5.1 if you
  *  have issues with database views.
+ *
+ *  Note: find(count) has its own return values.
+ *
  * @param string $type Type of find operation (all / first / count / neighbors / list / threaded)
  * @param array $query Option fields (conditions / fields / joins / limit / offset / order / page / group / callbacks)
- * @return array Array of records
+ * @return array Array of records, or Null on failure.
  * @link http://book.cakephp.org/2.0/en/models/deleting-data.html#deleteall
  */
 	public function find($type = 'first', $query = array()) {
@@ -2638,10 +2682,10 @@ class Model extends Object implements CakeEventListener {
 
 		if ($type === 'all') {
 			return $results;
-		} else {
-			if ($this->findMethods[$type] === true) {
-				return $this->{'_find' . ucfirst($type)}('after', $query, $results);
-			}
+		}
+
+		if ($this->findMethods[$type] === true) {
+			return $this->{'_find' . ucfirst($type)}('after', $query, $results);
 		}
 	}
 
@@ -2662,10 +2706,8 @@ class Model extends Object implements CakeEventListener {
 			(array)$query
 		);
 
-		if ($type !== 'all') {
-			if ($this->findMethods[$type] === true) {
-				$query = $this->{'_find' . ucfirst($type)}('before', $query);
-			}
+		if ($type !== 'all' && $this->findMethods[$type] === true) {
+			$query = $this->{'_find' . ucfirst($type)}('before', $query);
 		}
 
 		if (!is_numeric($query['page']) || intval($query['page']) < 1) {
@@ -2707,7 +2749,7 @@ class Model extends Object implements CakeEventListener {
 			return $query;
 		} elseif ($state === 'after') {
 			if (empty($results[0])) {
-				return false;
+				return array();
 			}
 			return $results[0];
 		}
@@ -2724,7 +2766,7 @@ class Model extends Object implements CakeEventListener {
  */
 	protected function _findCount($state, $query, $results = array()) {
 		if ($state === 'before') {
-			if (!empty($query['type']) && isset($this->findMethods[$query['type']]) && $query['type'] !== 'count' ) {
+			if (!empty($query['type']) && isset($this->findMethods[$query['type']]) && $query['type'] !== 'count') {
 				$query['operation'] = 'count';
 				$query = $this->{'_find' . ucfirst($query['type'])}('before', $query);
 			}
@@ -2749,11 +2791,10 @@ class Model extends Object implements CakeEventListener {
 		} elseif ($state === 'after') {
 			foreach (array(0, $this->alias) as $key) {
 				if (isset($results[0][$key]['count'])) {
-					if (($count = count($results)) > 1) {
-						return $count;
-					} else {
-						return intval($results[0][$key]['count']);
+					if ($query['group']) {
+						return count($results);
 					}
+					return intval($results[0][$key]['count']);
 				}
 			}
 			return false;
@@ -2813,8 +2854,7 @@ class Model extends Object implements CakeEventListener {
 			if (empty($results)) {
 				return array();
 			}
-			$lst = $query['list'];
-			return Hash::combine($results, $lst['keyPath'], $lst['valuePath'], $lst['groupPath']);
+			return Hash::combine($results, $query['list']['keyPath'], $query['list']['valuePath'], $query['list']['groupPath']);
 		}
 	}
 
@@ -2962,10 +3002,9 @@ class Model extends Object implements CakeEventListener {
 				unset($fields[$field]);
 
 				$field = $value;
+				$value = null;
 				if (isset($this->data[$this->alias][$field])) {
 					$value = $this->data[$this->alias][$field];
-				} else {
-					$value = null;
 				}
 			}
 
@@ -2980,7 +3019,7 @@ class Model extends Object implements CakeEventListener {
 		if (!empty($this->id)) {
 			$fields[$this->alias . '.' . $this->primaryKey . ' !='] = $this->id;
 		}
-		return ($this->find('count', array('conditions' => $fields, 'recursive' => -1)) == 0);
+		return !$this->find('count', array('conditions' => $fields, 'recursive' => -1));
 	}
 
 /**
@@ -3081,14 +3120,13 @@ class Model extends Object implements CakeEventListener {
 		if (empty($this->id) || (is_array($this->id) && isset($this->id[0]) && empty($this->id[0]))) {
 			return false;
 		}
-
 		if (!is_array($this->id)) {
 			return $this->id;
 		}
-
 		if (isset($this->id[$list]) && !empty($this->id[$list])) {
 			return $this->id[$list];
-		} elseif (isset($this->id[$list])) {
+		}
+		if (isset($this->id[$list])) {
 			return false;
 		}
 
@@ -3151,7 +3189,7 @@ class Model extends Object implements CakeEventListener {
 	public function setDataSource($dataSource = null) {
 		$oldConfig = $this->useDbConfig;
 
-		if ($dataSource != null) {
+		if ($dataSource) {
 			$this->useDbConfig = $dataSource;
 		}
 		$db = ConnectionManager::getDataSource($this->useDbConfig);
@@ -3197,7 +3235,7 @@ class Model extends Object implements CakeEventListener {
  * @return array Associations
  */
 	public function getAssociated($type = null) {
-		if ($type == null) {
+		if (!$type) {
 			$associated = array();
 			foreach ($this->_associations as $assoc) {
 				if (!empty($this->{$assoc})) {
@@ -3208,29 +3246,30 @@ class Model extends Object implements CakeEventListener {
 				}
 			}
 			return $associated;
-		} elseif (in_array($type, $this->_associations)) {
+		}
+		if (in_array($type, $this->_associations)) {
 			if (empty($this->{$type})) {
 				return array();
 			}
 			return array_keys($this->{$type});
-		} else {
-			$assoc = array_merge(
-				$this->hasOne,
-				$this->hasMany,
-				$this->belongsTo,
-				$this->hasAndBelongsToMany
-			);
-			if (array_key_exists($type, $assoc)) {
-				foreach ($this->_associations as $a) {
-					if (isset($this->{$a}[$type])) {
-						$assoc[$type]['association'] = $a;
-						break;
-					}
-				}
-				return $assoc[$type];
-			}
-			return null;
 		}
+
+		$assoc = array_merge(
+			$this->hasOne,
+			$this->hasMany,
+			$this->belongsTo,
+			$this->hasAndBelongsToMany
+		);
+		if (array_key_exists($type, $assoc)) {
+			foreach ($this->_associations as $a) {
+				if (isset($this->{$a}[$type])) {
+					$assoc[$type]['association'] = $a;
+					break;
+				}
+			}
+			return $assoc[$type];
+		}
+		return null;
 	}
 
 /**
@@ -3245,7 +3284,8 @@ class Model extends Object implements CakeEventListener {
 		if (is_string($assoc)) {
 			list(, $assoc) = pluginSplit($assoc);
 			return array($assoc, array_keys($this->{$assoc}->schema()));
-		} elseif (is_array($assoc)) {
+		}
+		if (is_array($assoc)) {
 			$with = key($assoc);
 			return array($with, array_unique(array_merge($assoc[$with], $keys)));
 		}
@@ -3382,19 +3422,18 @@ class Model extends Object implements CakeEventListener {
 	}
 
 /**
- * Retunrs an instance of a model validator for this class
+ * Returns an instance of a model validator for this class
  *
+ * @param ModelValidator Model validator instance.
+ *  If null a new ModelValidator instance will be made using current model object
  * @return ModelValidator
  */
-	public function validator($instance = null) {
-		if ($instance instanceof ModelValidator) {
-			return $this->_validator = $instance;
-		}
-
-		if (empty($this->_validator) && is_null($instance)) {
+	public function validator(ModelValidator $instance = null) {
+		if ($instance) {
+			$this->_validator = $instance;
+		} elseif (!$this->_validator) {
 			$this->_validator = new ModelValidator($this);
 		}
-
 		return $this->_validator;
 	}
 
