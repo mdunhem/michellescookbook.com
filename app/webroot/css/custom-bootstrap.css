@@ -1198,7 +1198,7 @@
   text-shadow: rgba(255, 255, 255, 0.75) 2px 2px 0;
 }
 /**** Bootstrap edits ****/
-.nav-stacked > li > input {
+/*.nav-stacked > li > input {
   background: transparent;
   border: 0;
   font-family: Arial, Helvetica, sans-serif;
@@ -1249,7 +1249,7 @@
 }
 .nav-pills.nav-stacked > li:last-child > input {
   margin-bottom: 1px;
-}
+}*/
 /* ---------- Login Form -------------- */
 .RecipesForm .row-fluid [class*="span"] {
   float: none;
